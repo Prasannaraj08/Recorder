@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Online Voting System</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f2f5;
+      padding: 30px;
+      text-align: center;
+    }
+    h1 { color: #2c3e50; }
+    .candidate {
+      margin: 10px 0;
+    }
+    button {
+      padding: 10px 20px;
+      margin-top: 10px;
+      cursor: pointer;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+    .results {
+      margin-top: 30px;
+    }
+    .bar {
+      height: 20px;
+      background-color: #2ecc71;
+      margin: 5px 0;
+      text-align: left;
+      color: white;
+      padding-left: 5px;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Online Voting System</h1>
+
+  <div class="candidate">
+    <input type="radio" name="vote" value="Alice" /> Alice<br/>
+    <input type="radio" name="vote" value="Bob" /> Bob<br/>
+    <input type="radio" name="vote" value="Charlie" /> Charlie
+  </div>
+
+  <button onclick="submitVote()">Submit Vote</button>
+
+  <div class="results">
+    <h2>Results</h2>
+    <div id="resultContainer"></div>
+  </div>
+
+  <script>
+    const candidates = ['Alice', 'Bob', 'Charlie'];
+
+    function getVotes() {
+      const votes = JSON.parse(localStorage.getItem('votes')) || {};
+      candidates.forEach(c => {
+        if (!votes[c]) votes[c] = 0;
+      });
+      return votes;
+    }
+
+    function submitVote() {
+      if (localStorage.getItem('voted')) {
+        alert('You have already voted!');
+        return;
+      }
+
+      const selected = document.querySelector('input[name="vote"]:checked');
+      if (!selected) {
+        alert('Please select a candidate.');
+        return;
+      }
+
+      const votes = getVotes();
+      votes[selected.value]++;
+      localStorage.setItem('votes', JSON.stringify(votes));
+      localStorage.setItem('voted', 'true');
+
+      alert('Vote submitted successfully!');
+      displayResults();
+    }
+
+    function displayResults() {
+      const votes = getVotes();
+      const container = document.getElementById('resultContainer');
+      container.innerHTML = '';
+
+      const total = Object.values(votes).reduce((a, b) => a + b, 0);
+
+      candidates.forEach(c => {
+        const percent = total ? ((votes[c] / total) * 100).toFixed(1) : 0;
+        container.innerHTML += `
+          <div>${c}: ${votes[c]} vote(s)</div>
+          <div class="bar" style="width:${percent}%">${percent}%</div>
+        `;
+      });
+    }
+
+    displayResults();
+  </script>
+
+</body>
+</html>
